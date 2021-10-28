@@ -5,6 +5,13 @@ from .models import Image, User
 
 
 class RegisterSerializer(serializers.ModelSerializer):
+
+    def validate_password(self, value: str) -> str:
+        """
+        Hashing password
+        """
+        return make_password(value, hasher='default')
+
     class Meta:
         model = User
         fields = ('id', 'username', 'password')
@@ -17,15 +24,10 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
         fields = '__all__'
-
-    def validate_password(self, value: str) -> str:
-        """
-        Hashing password
-        """
-        return make_password(value)
 
 
 class ImageSerializer(serializers.ModelSerializer):
