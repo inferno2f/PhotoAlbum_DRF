@@ -3,11 +3,12 @@ from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import (TokenObtainPairView,
                                             TokenRefreshView)
 
-from .views import AlbumViewSet, RegisterApi
+from .views import AlbumViewSet, RegisterApi, ImageDetailViewSet
 
 
 router = DefaultRouter()
 router.register(r'album', AlbumViewSet)
+router.register(r'album/image/(?P<image_id>.+)', ImageDetailViewSet)
 
 app_name = 'api'
 

@@ -1,5 +1,6 @@
-from rest_framework import permissions, viewsets, generics
+from rest_framework import generics, mixins, permissions, viewsets
 from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
 
 from .models import Image, User
 from .permissions import IsAlbumOwner
@@ -19,7 +20,10 @@ class RegisterApi(generics.GenericAPIView):
         })
 
 
-class AlbumViewSet(viewsets.ModelViewSet):
+class AlbumViewSet(mixins.CreateModelMixin,
+                   mixins.ListModelMixin,
+                   viewsets.GenericViewSet,):
+
     queryset = User.objects.all()
     serializer_class = ImageSerializer
     permission_classes = (IsAlbumOwner, permissions.IsAuthenticated)
@@ -31,9 +35,18 @@ class AlbumViewSet(viewsets.ModelViewSet):
         return serializer.save(author=self.request.user)
 
 
-class ImageViewSet(viewsets.ModelViewSet):
+class ImageDetailViewSet(viewsets.ModelViewSet):
+    queryset = Image.objects.all()
     serializer_class = ImageSerializer
-    permission_classes = (IsAlbumOwner,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def _get_image(self):
+        image = get_object_or_404(Image, id=self.kwargs['image_id'])
+        image.views = image.views + 1
+        image.save(update_fields=('views',))
+        return image
 
     def get_queryset(self):
-        return self.request.user.images.all()
+        self._get_image()
+        queryset = Image.objects.filter(id=self.kwargs['image_id'])
+        return queryset

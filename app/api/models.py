@@ -9,7 +9,7 @@ class Image(models.Model):
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="images"
     )
-    image = models.ImageField(upload_to='media/', null=True, blank=True)
+    image = models.ImageField(null=True, blank=True)
     description = models.CharField(max_length=150)
     views = models.PositiveIntegerField(default=0)
     date_added = models.DateTimeField('Posted on: ', auto_now_add=True)
