@@ -34,10 +34,14 @@ class ImageSerializer(serializers.ModelSerializer):
     image = serializers.ImageField()
 
     def validate_image(self, image):
-        """Ensuring that the file size doesn't exceed 5 Mb"""
+        """
+        Validates size and type of image allowed for upload.
+        """
         MAX_FILE_SIZE = 5000000
         if image.size > MAX_FILE_SIZE:
             raise ValidationError('Image size can\'t exceed 5 Mb.')
+        elif not image.name.lower().endswith(('.png', '.jpg', '.jpeg')):
+            raise ValidationError('You can\'t upload this type of file.')
 
     class Meta:
         fields = '__all__'
