@@ -8,6 +8,10 @@ from .serializers import ImageSerializer, RegisterSerializer, UserSerializer
 
 
 class RegisterApi(generics.GenericAPIView):
+    """
+    API view for user sign-up.
+    Accepts 'POST' request. Requiered fields: 'username' and 'password'.
+    """
     serializer_class = RegisterSerializer
 
     def post(self, request, *args,  **kwargs):
@@ -23,7 +27,11 @@ class RegisterApi(generics.GenericAPIView):
 class AlbumViewSet(mixins.CreateModelMixin,
                    mixins.ListModelMixin,
                    viewsets.GenericViewSet,):
-
+    """
+    This viewset allows 'GET' and 'POST' requests for authorized users.
+    User can get a list of all of the photos he posted and post a new one.
+    For privacy reasons users are not allowed to view photos of other users.
+    """
     queryset = User.objects.all()
     serializer_class = ImageSerializer
     permission_classes = (IsAlbumOwner, permissions.IsAuthenticated)
@@ -37,6 +45,12 @@ class AlbumViewSet(mixins.CreateModelMixin,
 
 class ImageDetailViewSet(mixins.RetrieveModelMixin, mixins.DestroyModelMixin,
                          mixins.UpdateModelMixin, viewsets.GenericViewSet):
+    """
+    This viewset allows 'GET', 'PUT', 'PATCH' and 'DELETE' requests.
+    Users can retrieve, edit and delete specific images.
+    Retrieving specific image is recorded in 'views' field of the Image model.
+    For privacy reasons users are not allowed to view photos of other users.
+    """
     queryset = Image.objects.all()
     serializer_class = ImageSerializer
     permission_classes = (permissions.IsAuthenticated, IsAlbumOwner)
@@ -48,6 +62,5 @@ class ImageDetailViewSet(mixins.RetrieveModelMixin, mixins.DestroyModelMixin,
         return image.id
 
     def get_queryset(self):
-        # self._get_image()
         queryset = Image.objects.filter(id=self._get_image())
         return queryset
