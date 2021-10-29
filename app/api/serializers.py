@@ -1,4 +1,5 @@
 from django.contrib.auth.hashers import make_password
+from django.core.exceptions import ValidationError
 from rest_framework import serializers
 
 from .models import Image, User
@@ -7,9 +8,7 @@ from .models import Image, User
 class RegisterSerializer(serializers.ModelSerializer):
 
     def validate_password(self, value: str) -> str:
-        """
-        Hashing password
-        """
+        """ Returns hashed password """
         return make_password(value, hasher='default')
 
     class Meta:
@@ -24,7 +23,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-
+    """ User model serializer """
     class Meta:
         model = User
         fields = '__all__'
@@ -32,6 +31,13 @@ class UserSerializer(serializers.ModelSerializer):
 
 class ImageSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField(many=False)
+    image = serializers.ImageField()
+
+    def validate_image(self, image):
+        """Ensuring that the file size doesn't exceed 5 Mb"""
+        MAX_FILE_SIZE = 5000000
+        if image.size > MAX_FILE_SIZE:
+            raise ValidationError('Image size can\'t exceed 5 Mb.')
 
     class Meta:
         fields = '__all__'

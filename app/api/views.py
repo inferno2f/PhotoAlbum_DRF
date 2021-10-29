@@ -35,18 +35,19 @@ class AlbumViewSet(mixins.CreateModelMixin,
         return serializer.save(author=self.request.user)
 
 
-class ImageDetailViewSet(viewsets.ModelViewSet):
+class ImageDetailViewSet(mixins.RetrieveModelMixin, mixins.DestroyModelMixin,
+                         mixins.UpdateModelMixin, viewsets.GenericViewSet):
     queryset = Image.objects.all()
     serializer_class = ImageSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticated, IsAlbumOwner)
 
     def _get_image(self):
-        image = get_object_or_404(Image, id=self.kwargs['image_id'])
+        image = get_object_or_404(Image, id=self.kwargs['pk'])
         image.views = image.views + 1
         image.save(update_fields=('views',))
-        return image
+        return image.id
 
     def get_queryset(self):
-        self._get_image()
-        queryset = Image.objects.filter(id=self.kwargs['image_id'])
+        # self._get_image()
+        queryset = Image.objects.filter(id=self._get_image())
         return queryset

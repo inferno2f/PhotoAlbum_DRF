@@ -8,7 +8,7 @@ from .views import AlbumViewSet, RegisterApi, ImageDetailViewSet
 
 router = DefaultRouter()
 router.register(r'album', AlbumViewSet)
-router.register(r'album/image/(?P<image_id>.+)', ImageDetailViewSet)
+router.register(r'album/image', ImageDetailViewSet)
 
 app_name = 'api'
 
