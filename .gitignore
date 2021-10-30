@@ -133,3 +133,5 @@ dmypy.json
 
 # Local media folder
 media/
+
+.DS_Store
